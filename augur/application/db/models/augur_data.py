@@ -271,9 +271,9 @@ class Contributor(Base):
     def from_github(cls, contributor, tool_source, tool_version, data_source):
         from augur.tasks.util.AugurUUID import GithubUUID
 
-        cntrb_id = GithubUUID()   
+        cntrb_id = GithubUUID()
         cntrb_id["user"] = contributor["id"]
-        
+
         contributor_obj = cls()
 
         contributor_obj.cntrb_id = cntrb_id.to_UUID()
@@ -587,7 +587,7 @@ class RepoGroup(Base):
             return False
 
         return True
-    
+
     @staticmethod
     def get_by_name(session, rg_name):
 
@@ -598,7 +598,7 @@ class RepoGroup(Base):
                 result = execute_session_query(query, 'one')
             except NoResultFound:
                 return None
-        
+
         return result
 
 
@@ -846,7 +846,7 @@ class Repo(Base):
     repo_added = Column(
         TIMESTAMP(precision=0), nullable=False, server_default=text("CURRENT_TIMESTAMP")
     )
-    
+
     #repo_status = Column(
     #    String, nullable=False, server_default=text("'New'::character varying")
     #)
@@ -890,7 +890,7 @@ class Repo(Base):
             session.rollback()
             raise e
 
-        
+
 
     @staticmethod
     def get_by_repo_git(session, repo_git):
@@ -953,9 +953,9 @@ class Repo(Base):
                 return False, {"status": f"Github Error: {data['message']}"}
 
             return True, {"status": "Valid repo", "repo_type": data["owner"]["type"]}
-        
+
         return False, {"status": "Failed to validate repo after multiple attempts"}
-        
+
     @staticmethod
     def is_valid_gitlab_repo(gl_session, url: str) -> bool:
         """Determine whether a GitLab repo URL is valid.
@@ -1011,7 +1011,7 @@ class Repo(Base):
         Returns:
             Tuple of owner and repo. Or a tuple of None and None if the url is invalid.
         """
-        
+
         result = re.search(r"https?:\/\/github\.com\/([A-Za-z0-9 \- _]+)\/([A-Za-z0-9 \- _ \.]+)(.git)?\/?$", url)
 
         if not result:
@@ -1023,7 +1023,7 @@ class Repo(Base):
         repo = capturing_groups[1]
 
         return owner, repo
-    
+
     @staticmethod
     def parse_gitlab_repo_url(url: str) -> tuple:
         """ Gets the owner and repo from a gitlab url.
@@ -1034,7 +1034,7 @@ class Repo(Base):
         Returns:
             Tuple of owner and repo. Or a tuple of None and None if the url is invalid.
         """
-        
+
         result = re.search(r"https?:\/\/gitlab\.com\/([A-Za-z0-9\-_\/]+)\/([A-Za-z0-9\-_]+)(\.git)?\/?$", url)
 
         if not result:
@@ -1084,12 +1084,12 @@ class Repo(Base):
 
         if not RepoGroup.is_valid_repo_group_id(session, repo_group_id):
             return None
-        
+
         if url.endswith("/"):
             url = url[:-1]
-        
+
         url = url.lower()
-        
+
         owner, repo = Repo.parse_gitlab_repo_url(url)
         if not owner or not repo:
             return None
@@ -1133,12 +1133,12 @@ class Repo(Base):
 
         if not RepoGroup.is_valid_repo_group_id(session, repo_group_id):
             return None
-        
+
         if url.endswith("/"):
             url = url[:-1]
-        
+
         url = url.lower()
-        
+
         owner, repo = Repo.parse_github_repo_url(url)
         if not owner or not repo:
             return None
@@ -1166,7 +1166,7 @@ class Repo(Base):
 
 
 
-        
+
 class RepoTestCoverage(Base):
     __tablename__ = "repo_test_coverage"
     __table_args__ = {"schema": "augur_data"}
@@ -1360,7 +1360,7 @@ class Commit(Base):
 class CommitMessage(Base):
     __tablename__ = "commit_messages"
     __table_args__ = ( UniqueConstraint("repo_id","cmt_hash", name="commit-message-insert-unique"),
-        { 
+        {
             "schema": "augur_data",
             "comment": "This table holds commit messages",
         }
@@ -1456,7 +1456,7 @@ class Issue(Base):
 
     # @classmethod
     # def from_github(cls):
-        
+
     #     issue_obj = cls()
 
     #     return issue_obj
@@ -1604,7 +1604,7 @@ class Message(Base):
 
     # @classmethod
     # def from_github(cls):
-        
+
     #     message_obj = cls()
 
     #     return message_obj
@@ -2437,7 +2437,7 @@ class IssueAssignee(Base):
 
     @classmethod
     def from_github(cls, assignee, repo_id, tool_source, tool_version, data_source):
-        
+
         issue_assignee_obj = cls()
 
         issue_assignee_obj.cntrb_id = assignee["cntrb_id"] # # this is added to the data by the function process_issue_contributors in issue_tasks.py
@@ -2446,7 +2446,7 @@ class IssueAssignee(Base):
         issue_assignee_obj.data_source = data_source
         issue_assignee_obj.issue_assignee_src_id = int(assignee['id'])
         issue_assignee_obj.issue_assignee_src_node = assignee['node_id']
-        issue_assignee_obj.repo_id = repo_id 
+        issue_assignee_obj.repo_id = repo_id
 
         return issue_assignee_obj
 
@@ -2518,7 +2518,7 @@ class IssueEvent(Base):
 
     @classmethod
     def from_github(cls, event, repo_id, platform_id, tool_source, tool_version, data_source):
-        
+
         issue_event_obj = cls()
 
         issue_event_obj.issue_event_src_id = int(event['id'])
@@ -2591,7 +2591,7 @@ class IssueLabel(Base):
         issue_label_obj.data_source = data_source
         issue_label_obj.label_src_id = int(label['id'])
         issue_label_obj.label_src_node_id = label['node_id']
-        issue_label_obj.repo_id = repo_id 
+        issue_label_obj.repo_id = repo_id
 
         return issue_label_obj
 
@@ -2884,7 +2884,7 @@ class PullRequestAssignee(Base):
 
     @classmethod
     def from_github(cls, assignee, repo_id, tool_source, tool_version, data_source):
-        
+
         pr_assignee_ojb = cls()
 
         # store the pr_url data on in the pr assignee data for now so we can relate it back to a pr later
@@ -3028,7 +3028,7 @@ class PullRequestEvent(Base):
 
     @classmethod
     def from_github(cls, event, pr_id, repo_id, tool_source, tool_version, data_source):
-        
+
         pr_event_obj = cls()
 
         pr_event_obj.pull_request_id = pr_id
@@ -3052,6 +3052,7 @@ class PullRequestEvent(Base):
 class PullRequestFile(Base):
     __tablename__ = "pull_request_files"
     __table_args__ = (
+        Index("repo_id"),
         UniqueConstraint("pull_request_id", "repo_id", "pr_file_path"),
         {
             "schema": "augur_data",
@@ -3097,7 +3098,7 @@ class PullRequestFile(Base):
 
     # @classmethod
     # def from_github(cls):
-        
+
     #     pr_file_obj = cls()
 
     #     return pr_file_obj
@@ -3139,7 +3140,7 @@ class PullRequestLabel(Base):
     data_collection_date = Column(
         TIMESTAMP(precision=0), server_default=text("CURRENT_TIMESTAMP")
     )
-    
+
 
     pull_request = relationship("PullRequest", back_populates="labels")
     repo = relationship("Repo")
@@ -3270,7 +3271,7 @@ class PullRequestMeta(Base):
 
     @classmethod
     def from_github(cls, meta, repo_id, tool_source, tool_version, data_source):
-        
+
         pr_meta_obj = cls()
 
         pr_meta_obj.pr_head_or_base = meta['pr_head_or_base']
@@ -3412,7 +3413,7 @@ class PullRequestReview(Base):
 
     # @classmethod
     # def from_github(cls):
-        
+
     #     pr_review_obj = cls()
 
     #     return pr_reivew_obj
